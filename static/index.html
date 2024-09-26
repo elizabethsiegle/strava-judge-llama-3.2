@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate my Workout</title>
+    <title>AI Strava Judge w/ LLaMA-3.2-11b-vision-instruct and Cloudflare Workers AI</title>
     <style>
+         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
         body {
-            font-family: 'Arial', sans-serif;
+            /* Option 1: Comic Sans */
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            
+            /* Option 2: Tech/Computer-y font (uncomment to use) */
+            /* font-family: 'VT323', monospace; */
+            
             background-color: #f5f5f5;
             color: #333;
             margin: 0;
@@ -16,6 +23,9 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><text y="40%" fill="%23ff7f50" font-size="50">🏃‍♀️🚴‍♀️🏊‍♀️</text></svg>');
+            background-repeat: repeat;
+            background-size: 150px 150px;
         }
         .container {
             max-width: 600px;
@@ -30,6 +40,12 @@
             text-align: center;
             color: #ff7f50;
             font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            text-align: center;
+            color: #ff7f50;
+            font-size: 1.0rem;
             margin-bottom: 2rem;
         }
         .upload-section {
@@ -76,10 +92,6 @@
         .analyze-section {
             text-align: center;
         }
-        #result {
-            margin-top: 2rem;
-            text-align: center;
-        }
         #imagePreview {
             max-width: 100%;
             max-height: 300px;
@@ -87,6 +99,11 @@
             display: none;
             border-radius: 5px;
             border: 2px solid #ff7f50;
+        }
+        #result {
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
         }
         footer {
             background-color: #fff;
@@ -101,7 +118,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏃‍♂️ Strava Judge 🏃‍♀️</h1>
+        <h1>🏃‍♀️🚴‍♀️🏊‍♀️ AI Strava Judge 🏃‍♀️🚴‍♀️🏊‍♀️</h1>
+        <h2>w/ <a href="https://developers.cloudflare.com/workers-ai/models/llama-3.2-11b-vision-instruct">LLaMA-3.2-11b-vision-instruct</a> && <a href="https://developers.cloudflare.com/workers-ai">Cloudflare Workers AI</a></h2>
         <form id="uploadForm">
             <div class="upload-section">
                 <label for="imageInput" class="upload-btn">Upload Your Workout Image</label>
@@ -115,7 +133,7 @@
         <div id="result"></div>
     </div>
     <footer>
-        Made with ❤️ in SF🌁 -> <a href="https://github.com/elizabethsiegle/astrology-sign-predictor-llava">Code here on GitHub👩🏻‍💻</a>
+        Made with ❤️ in SF 🌁 using <a href="https://developers.cloudflare.com/workers-ai">Cloudflare Workers AI</a><br><br> <a href="https://github.com/elizabethsiegle/strava-judge-llama-3.2">✅ out the code👩🏻‍💻 on GitHub</a>
     </footer>
 
     <script>
@@ -146,24 +164,30 @@
             }
 
             analyzeBtn.disabled = true;
-            analyzeBtn.textContent = 'Analyzing🏃...';
+            analyzeBtn.textContent = 'Analyzing🏃‍♀️🚴‍♀️🏊‍♀️...';
             resultDiv.textContent = '';
 
             const formData = new FormData();
             formData.append('image', imageFile);
-
+            let response;
             try {
-                const response = await fetch('/analyze-image', {
+                response = await fetch('/analyze-image', {
                     method: 'POST',
                     body: formData
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const result = await response.json();
                 resultDiv.innerHTML = result.response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/^(.*?:)/gm, '<br><br>$1')
                     .replace(/(\d+\. )/g, '<br>$1')
                     .replace(/(\* )/g, '<br>• ');
+                resultDiv.style.display = 'block';
             } catch (error) {
-                resultDiv.textContent = `An error occurred during analysis ${error}`;
+                console.error('Error:', error);
+                resultDiv.innerHTML = `An error occurred during analysis: ${error.message}`;
+                resultDiv.style.display = 'block';
             } finally {
                 analyzeBtn.disabled = false;
                 analyzeBtn.textContent = 'Analyze Image';
@@ -172,3 +196,4 @@
     </script>
 </body>
 </html>
+

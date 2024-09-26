@@ -19,7 +19,7 @@ export default {
 			const uint8Array = new Uint8Array(arrayBuffer);
 			const input = {
 				image: [...uint8Array],
-				prompt: "You are a workout judger. Rate and provide some workout inspiration in a short blurb, mentioning the distance and elevation gain of their workout",
+				prompt: "You are a workout judger. In an encouraging tone, rate and provide some workout inspiration in a short blurb, mentioning the city location,distance, time, and elevation gain of their input workout. Keep it short, sweet, and simple.",
 				max_tokens: 512,
 			};
 			try {
